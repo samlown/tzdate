@@ -53,22 +53,36 @@
   // `timezoneJS.timezone.transport` to a `function`. More details will follow
   var $ = root.$ || root.jQuery || root.Zepto
     , fleegix = root.fleegix
-  // Declare constant list of days and months. Unfortunately this doesn't leave room for i18n due to the Olson data being in English itself
-    , DAYS = timezoneJS.Days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-    , MONTHS = timezoneJS.Months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-    , SHORT_MONTHS = {}
-    , SHORT_DAYS = {}
-    , EXACT_DATE_TIME = {}
+    , EXACT_DATE_TIME = {};
 
-  //`{ "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5, "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11 }`
-  for (var i = 0; i < MONTHS.length; i++) {
-    SHORT_MONTHS[MONTHS[i].substr(0, 3)] = i;
-  }
+  // Date name handling with basic locale support.
+  var defaultLocale = 'en';
+  var locales = {
+    'en': {
+      monthNames: ['January','February','March','April','May','June','July','August','September','October','November','Dicember'],
+      monthNamesShort: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dic'],
+      dayNames: ['Sunday', 'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+      dayNamesShort: ['Sun','Mon','Tue','Wed','Thu','Fri', 'Sat']
+    }
+  };
 
-  //`{ "Sun": 0, "Mon": 1, "Tue": 2, "Wed": 3, "Thu": 4, "Fri": 5, "Sat": 6 }`
-  for (i = 0; i < DAYS.length; i++) {
-    SHORT_DAYS[DAYS[i].substr(0, 3)] = i;
-  }
+  var _namesForLocale = function(locale) {
+    locale ||= defaultLocale;
+    throw "Invalid locale!" if (!locales[locale]);
+    return locales[locale]
+  };
+  var _monthNames = function(locale) {
+    return _namesForLocale(locale).monthNames;
+  };
+  var _monthNamesShort = function(locale) {
+    return _namesForLocale(locale).monthNamesShort;
+  };
+  var _dayNames = function(locale) {
+    return _namesForLocale(locale).dayNames;
+  };
+  var _dayNamesShort = function(locale) {
+    return _namesForLocale(locale).dayNamesShort;
+  };
 
 
   //Handle array indexOf in IE
@@ -356,14 +370,14 @@
       .replace(/s+/g, function (token) { return _fixWidth(_this.getSeconds(), token.length); })
       // `S`: millisecond
       .replace(/S+/g, function (token) { return _fixWidth(_this.getMilliseconds(), token.length); })
-      // `M`: month. Note: `MM` will be the numeric representation (e.g February is 02) but `MMM` will be text representation (e.g February is Feb)
+      // `M`: month. Note: `MM` will be the numeric representation (e.g February is 02), `MMM` will be short text representation (e.g February is Feb), and `MMMM` will be long text representation.
       .replace(/M+/g, function (token) {
         var _month = _this.getMonth(),
         _len = token.length;
         if (_len > 3) {
-          return timezoneJS.Months[_month];
+          return _monthNames()[_month];
         } else if (_len > 2) {
-          return timezoneJS.Months[_month].substring(0, _len);
+          return _monthNamesShort()[_month];
         }
         return _fixWidth(_month + 1, _len);
       })
@@ -380,7 +394,17 @@
       // `H`: hour
       .replace(/H+/g, function (token) { return _fixWidth(hours, token.length); })
       // `E`: day
-      .replace(/E+/g, function (token) { return DAYS[_this.getDay()].substring(0, token.length); })
+      .replace(/E+/g, function (token) {
+        var _day = _this.getDay(),
+        _len = token.length;
+        if (_len > 3) {
+          return _dayNames()[_day];
+        } else if (_len > 2) {
+          return _dayNamesShort()[_day];
+        } else {
+          return _dayNames()[_day].substring(0, _len);
+        }
+      })
       // `Z`: timezone abbreviation
       .replace(/Z+/gi, function () { return tzInfo.tzAbbr; });
     },
@@ -468,7 +492,7 @@
       var mon = 11;
       var dat = 31;
       if (z[4]) {
-        mon = SHORT_MONTHS[z[4].substr(0, 3)];
+        mon = _monthNamesShort()[z[4].substr(0, 3)];
         dat = parseInt(z[5], 10) || 1;
       }
       var string = z[6] ? z[6] : '00:00:00'
@@ -578,7 +602,7 @@
         else {
           //If we have a specific date, use that!
           if (!isNaN(rule[4])) {
-            effectiveDate = new Date(Date.UTC(year, SHORT_MONTHS[rule[3]], rule[4], hms[1], hms[2], hms[3], 0));
+            effectiveDate = new Date(Date.UTC(year, _monthNamesShort()[rule[3]], rule[4], hms[1], hms[2], hms[3], 0));
           }
           //Let's hunt for the date.
           else {
@@ -587,15 +611,15 @@
             //Example: `lastThu`
             if (rule[4].substr(0, 4) === "last") {
               // Start at the last day of the month and work backward.
-              effectiveDate = new Date(Date.UTC(year, SHORT_MONTHS[rule[3]] + 1, 1, hms[1] - 24, hms[2], hms[3], 0));
-              targetDay = SHORT_DAYS[rule[4].substr(4, 3)];
+              effectiveDate = new Date(Date.UTC(year, _monthNamesShort()[rule[3]] + 1, 1, hms[1] - 24, hms[2], hms[3], 0));
+              targetDay = _dayNamesShort()[rule[4].substr(4, 3)];
               operator = "<=";
             }
             //Example: `Sun>=15`
             else {
               //Start at the specified date.
-              effectiveDate = new Date(Date.UTC(year, SHORT_MONTHS[rule[3]], rule[4].substr(5), hms[1], hms[2], hms[3], 0));
-              targetDay = SHORT_DAYS[rule[4].substr(0, 3)];
+              effectiveDate = new Date(Date.UTC(year, _monthNamesShort()[rule[3]], rule[4].substr(5), hms[1], hms[2], hms[3], 0));
+              targetDay = _dayNamesShort()[rule[4].substr(0, 3)];
               operator = rule[4].substr(3, 2);
             }
             var ourDay = effectiveDate.getUTCDay();
