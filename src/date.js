@@ -56,34 +56,24 @@
     , EXACT_DATE_TIME = {};
 
   // Date name handling with basic locale support.
-  var defaultLocale = 'en';
-  var locales = {
-    'en': {
+  timezoneJS.defaultLocale = '';
+  timezoneJS.locales = {
+    '': {
       monthNames: ['January','February','March','April','May','June','July','August','September','October','November','Dicember'],
       monthNamesShort: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dic'],
       dayNames: ['Sunday', 'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
-      dayNamesShort: ['Sun','Mon','Tue','Wed','Thu','Fri', 'Sat']
+      dayNamesShort: ['Sun','Mon','Tue','Wed','Thu','Fri', 'Sat'],
+      amDesignator: 'AM',
+      pmDesignator: 'PM'
     }
   };
 
-  var _namesForLocale = function(locale) {
-    locale ||= defaultLocale;
-    throw "Invalid locale!" if (!locales[locale]);
-    return locales[locale]
+  var _getLocale = function(locale) {
+    locale ||= timezoneJS.defaultLocale;
+    if (!timezoneJS.locales[locale])
+      throw "Invalid locale, ensure you have provided a definition for '"+locale+"'";
+    return timezoneLocales[locale]
   };
-  var _monthNames = function(locale) {
-    return _namesForLocale(locale).monthNames;
-  };
-  var _monthNamesShort = function(locale) {
-    return _namesForLocale(locale).monthNamesShort;
-  };
-  var _dayNames = function(locale) {
-    return _namesForLocale(locale).dayNames;
-  };
-  var _dayNamesShort = function(locale) {
-    return _namesForLocale(locale).dayNamesShort;
-  };
-
 
   //Handle array indexOf in IE
   if (!Array.prototype.indexOf) {
@@ -345,7 +335,7 @@
     toISOString: function () { return this.toString('yyyy-MM-ddTHH:mm:ss.SSS', 'Etc/UTC') + 'Z'; },
     toJSON: function () { return this.toISOString(); },
     // Allows different format following ISO8601 format:
-    toString: function (format, tz) {
+    toString: function (format, tz, locale) {
       // Default format is the same as toISOString
       if (!format) return this.toString('yyyy-MM-dd HH:mm:ss');
       var result = format;
@@ -357,9 +347,12 @@
         _this.setTimezone(tz);
       }
       var hours = _this.getHours();
+
+      var locales = _getLocale(locale)
+
       return result
       // fix the same characters in Month names
-      .replace(/a+/g, function () { return 'k'; })
+      .replace(/[^']?a+/g, function () { return 'k'; })
       // `y`: year
       .replace(/y+/g, function (token) { return _fixWidth(_this.getFullYear(), token.length); })
       // `d`: date
@@ -375,9 +368,9 @@
         var _month = _this.getMonth(),
         _len = token.length;
         if (_len > 3) {
-          return _monthNames()[_month];
+          return locales.monthNames[_month];
         } else if (_len > 2) {
-          return _monthNamesShort()[_month];
+          return locales.monthNamesShort[_month];
         }
         return _fixWidth(_month + 1, _len);
       })
@@ -398,11 +391,12 @@
         var _day = _this.getDay(),
         _len = token.length;
         if (_len > 3) {
-          return _dayNames()[_day];
+          return locales.dayNames[_day];
         } else if (_len > 2) {
-          return _dayNamesShort()[_day];
+          return locales.dayNamesShort[_day];
         } else {
-          return _dayNames()[_day].substring(0, _len);
+          // Just return the day's first letter
+          return locales.dayNames[_day].substring(0, 1);
         }
       })
       // `Z`: timezone abbreviation
