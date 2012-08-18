@@ -10,22 +10,22 @@ var fs = require('fs');
     TestUtils = root.TestUtils = {};
   }
 
-  var init = function (timezoneJS, options) {
+  var init = function (TZDate, options) {
     var opts = {
       async: false,
-      loadingScheme: timezoneJS.timezone.loadingSchemes.LAZY_LOAD
+      loadingScheme: TZDate.timezone.loadingSchemes.LAZY_LOAD
     };
     for (var k in (options || {})) {
       opts[k] = options[k];
     }
     //Reset everything
-    timezoneJS.timezone.zones = {};
-    timezoneJS.timezone.rules = {};
-    timezoneJS.timezone.loadedZones = {};
+    TZDate.timezone.zones = {};
+    TZDate.timezone.rules = {};
+    TZDate.timezone.loadedZones = {};
 
     //Set up again
-    timezoneJS.timezone.zoneFileBasePath = 'lib/tz';
-    timezoneJS.timezone.transport = function (opts) {
+    TZDate.timezone.zoneFileBasePath = 'lib/tz';
+    TZDate.timezone.transport = function (opts) {
       // No success handler, what's the point?
       if (opts.async) {
         if (typeof opts.success !== 'function') return;
@@ -36,13 +36,13 @@ var fs = require('fs');
       }
       return fs.readFileSync(opts.url, 'utf8');
     };
-    timezoneJS.timezone.loadingScheme = opts.loadingScheme;
-    timezoneJS.timezone.init(opts);
-    return timezoneJS;
+    TZDate.timezone.loadingScheme = opts.loadingScheme;
+    TZDate.timezone.init(opts);
+    return TZDate;
   };
 
-  TestUtils.getTimezoneJS = function (options) {
-    return init(require('../src/date'), options);
+  TestUtils.getTZDate = function (options) {
+    return init(require('../src/tzdate'), options);
   }
 
   TestUtils.parseISO = function (timestring) {

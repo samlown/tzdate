@@ -1,7 +1,8 @@
 var TestUtils = require('./test-utils')
   , parseISO = TestUtils.parseISO
-  , timezoneJS = TestUtils.getTimezoneJS();
-describe('TimezoneJS', function () {
+  , TZDate = TestUtils.getTZDate();
+ 
+describe('TZDate', function () {
   it('should get America/Chicago DST time correctly', function () {
     var testDstLeap = function (arr) {
       var expectedArr = [360, 300, 300, 360];
@@ -9,7 +10,7 @@ describe('TimezoneJS', function () {
       var actual;
       var expected;
       for (var i = 0; i < arr.length; i++) {
-        dt = timezoneJS.timezone.getTzInfo(parseISO(arr[i]), 'America/Chicago');
+        dt = TZDate.timezone.getTzInfo(parseISO(arr[i]), 'America/Chicago');
         actual = dt.tzOffset;
         expected = expectedArr[i];
         expect(actual).toEqual(expected);
@@ -32,13 +33,13 @@ describe('TimezoneJS', function () {
     // Daylight: GMT-2 from Nov 2 - Feb 16
     var dt;
     // 2008
-    //dt = timezoneJS.timezone.getTzInfo(parseISO('2008-02-16-02:00'), 'America/Sao_Paulo');
+    //dt = TZDate.timezone.getTzInfo(parseISO('2008-02-16-02:00'), 'America/Sao_Paulo');
     //expect(120, dt.tzOffset);
-    dt = timezoneJS.timezone.getTzInfo(parseISO('2008-02-17'), 'America/Sao_Paulo');
+    dt = TZDate.timezone.getTzInfo(parseISO('2008-02-17'), 'America/Sao_Paulo');
     expect(dt.tzOffset).toEqual(180);
-    dt = timezoneJS.timezone.getTzInfo(parseISO('2008-10-11'), 'America/Sao_Paulo');
+    dt = TZDate.timezone.getTzInfo(parseISO('2008-10-11'), 'America/Sao_Paulo');
     expect(dt.tzOffset).toEqual(180);
-    dt = timezoneJS.timezone.getTzInfo(parseISO('2008-10-19'), 'America/Sao_Paulo');
+    dt = TZDate.timezone.getTzInfo(parseISO('2008-10-19'), 'America/Sao_Paulo');
     expect(dt.tzOffset).toEqual(120);
   });
 
@@ -47,22 +48,22 @@ describe('TimezoneJS', function () {
     // Changes every year!
     var dt;
     // 2006
-    dt = timezoneJS.timezone.getTzInfo(parseISO('2006-04-02T01:59:59'), 'America/New_York');
+    dt = TZDate.timezone.getTzInfo(parseISO('2006-04-02T01:59:59'), 'America/New_York');
     expect(dt.tzOffset).toEqual(300);
-    dt = timezoneJS.timezone.getTzInfo(parseISO('2006-04-02T03:00:01'), 'America/New_York');
+    dt = TZDate.timezone.getTzInfo(parseISO('2006-04-02T03:00:01'), 'America/New_York');
     expect(dt.tzOffset).toEqual(240);
-    dt = timezoneJS.timezone.getTzInfo(parseISO('2006-10-29T00:59:59'), 'America/New_York');
+    dt = TZDate.timezone.getTzInfo(parseISO('2006-10-29T00:59:59'), 'America/New_York');
     expect(dt.tzOffset).toEqual(240);
-    dt = timezoneJS.timezone.getTzInfo(parseISO('2006-10-29T03:00:01'), 'America/New_York');
+    dt = TZDate.timezone.getTzInfo(parseISO('2006-10-29T03:00:01'), 'America/New_York');
     expect(dt.tzOffset).toEqual(300);
     // 2009
-    dt = timezoneJS.timezone.getTzInfo(parseISO('2009-03-08T01:59:59'), 'America/New_York');
+    dt = TZDate.timezone.getTzInfo(parseISO('2009-03-08T01:59:59'), 'America/New_York');
     expect(dt.tzOffset).toEqual(300);
-    dt = timezoneJS.timezone.getTzInfo(parseISO('2009-03-08T03:00:01'), 'America/New_York');
+    dt = TZDate.timezone.getTzInfo(parseISO('2009-03-08T03:00:01'), 'America/New_York');
     expect(dt.tzOffset).toEqual(240);
-    dt = timezoneJS.timezone.getTzInfo(parseISO('2009-11-01T00:59:59'), 'America/New_York');
+    dt = TZDate.timezone.getTzInfo(parseISO('2009-11-01T00:59:59'), 'America/New_York');
     expect(dt.tzOffset).toEqual(240);
-    dt = timezoneJS.timezone.getTzInfo(parseISO('2009-11-01T03:00:01'), 'America/New_York');
+    dt = TZDate.timezone.getTzInfo(parseISO('2009-11-01T03:00:01'), 'America/New_York');
     expect(dt.tzOffset).toEqual(300);
   });
 
@@ -71,88 +72,88 @@ describe('TimezoneJS', function () {
     // Changes every year!
     var dt;
     // 2008
-    dt = timezoneJS.timezone.getTzInfo(parseISO('2008-03-28T01:59:59'), 'Asia/Jerusalem');
+    dt = TZDate.timezone.getTzInfo(parseISO('2008-03-28T01:59:59'), 'Asia/Jerusalem');
     expect(dt.tzOffset).toEqual(-120);
-    dt = timezoneJS.timezone.getTzInfo(parseISO('2008-03-28T03:00:01'), 'Asia/Jerusalem');
+    dt = TZDate.timezone.getTzInfo(parseISO('2008-03-28T03:00:01'), 'Asia/Jerusalem');
     expect(dt.tzOffset).toEqual(-180);
-    dt = timezoneJS.timezone.getTzInfo(parseISO('2008-10-05T00:59:59'), 'Asia/Jerusalem');
+    dt = TZDate.timezone.getTzInfo(parseISO('2008-10-05T00:59:59'), 'Asia/Jerusalem');
     expect(dt.tzOffset).toEqual(-180);
-    dt = timezoneJS.timezone.getTzInfo(parseISO('2008-10-05T03:00:01'), 'Asia/Jerusalem');
+    dt = TZDate.timezone.getTzInfo(parseISO('2008-10-05T03:00:01'), 'Asia/Jerusalem');
     expect(dt.tzOffset).toEqual(-120);
     // 2009
-    dt = timezoneJS.timezone.getTzInfo(parseISO('2009-03-27T01:59:59'), 'Asia/Jerusalem');
+    dt = TZDate.timezone.getTzInfo(parseISO('2009-03-27T01:59:59'), 'Asia/Jerusalem');
     expect(dt.tzOffset).toEqual(-120);
-    dt = timezoneJS.timezone.getTzInfo(parseISO('2009-03-27T03:00:01'), 'Asia/Jerusalem');
+    dt = TZDate.timezone.getTzInfo(parseISO('2009-03-27T03:00:01'), 'Asia/Jerusalem');
     expect(dt.tzOffset).toEqual(-180);
-    dt = timezoneJS.timezone.getTzInfo(parseISO('2009-09-27T00:59:59'), 'Asia/Jerusalem');
+    dt = TZDate.timezone.getTzInfo(parseISO('2009-09-27T00:59:59'), 'Asia/Jerusalem');
     expect(dt.tzOffset).toEqual(-180);
-    dt = timezoneJS.timezone.getTzInfo(parseISO('2009-09-27T03:00:01'), 'Asia/Jerusalem');
+    dt = TZDate.timezone.getTzInfo(parseISO('2009-09-27T03:00:01'), 'Asia/Jerusalem');
     expect(dt.tzOffset).toEqual(-120);
   });
 
   it('should get abbreviation of central EU time correctly', function () {
-    var dt = timezoneJS.timezone.getTzInfo(parseISO('2010-01-01'), 'Europe/Berlin'); // winter time (CET) for sure
+    var dt = TZDate.timezone.getTzInfo(parseISO('2010-01-01'), 'Europe/Berlin'); // winter time (CET) for sure
     expect(dt.tzAbbr).toEqual('CET');
   });
 
   it('should get abbr for central EU summer time correctly', function () {
-    var dt = timezoneJS.timezone.getTzInfo(parseISO('2010-07-01'), 'Europe/Berlin'); // summer time (CEST) for sure
+    var dt = TZDate.timezone.getTzInfo(parseISO('2010-07-01'), 'Europe/Berlin'); // summer time (CEST) for sure
     expect(dt.tzAbbr, 'CEST');
   });
 
   it('should get abbr for British Standard time correctly', function () {
-    var dt = timezoneJS.timezone.getTzInfo(parseISO('2010-01-01'), 'Europe/London'); // winter time (GMT) for sure
+    var dt = TZDate.timezone.getTzInfo(parseISO('2010-01-01'), 'Europe/London'); // winter time (GMT) for sure
     expect(dt.tzAbbr, 'GMT');
   });
 
   it('should get abbr for British summer time correctly', function () {
-    var dt = timezoneJS.timezone.getTzInfo(parseISO('2010-07-01'), 'Europe/London'); // summer time (BST) for sure
+    var dt = TZDate.timezone.getTzInfo(parseISO('2010-07-01'), 'Europe/London'); // summer time (BST) for sure
     expect(dt.tzAbbr, 'BST');
   });
 
   it('should get abbr CET from tz info of 2010-03-28T01:59:59', function () {
-    var dt = timezoneJS.timezone.getTzInfo(parseISO('2010-03-28T01:59:59'), 'Europe/Berlin'); // CET, from local time
+    var dt = TZDate.timezone.getTzInfo(parseISO('2010-03-28T01:59:59'), 'Europe/Berlin'); // CET, from local time
     expect(dt.tzAbbr).toEqual('CET');
   });
 
   it('should get abbr CEST from tz info of 2010-03-08T03:00:00', function () {
-    var dt = timezoneJS.timezone.getTzInfo(parseISO('2010-03-28T03:00:00'), 'Europe/Berlin'); // CEST, from local time
+    var dt = TZDate.timezone.getTzInfo(parseISO('2010-03-28T03:00:00'), 'Europe/Berlin'); // CEST, from local time
     expect(dt.tzAbbr, 'CEST');
   });
 
   it('should get abbr CET from tz info of 2010-03-08T00:59:59 UTC', function () {
-    var dt = timezoneJS.timezone.getTzInfo(parseISO('2010-03-28T00:59:59'), 'Europe/Berlin', true); // CEST, from local time
+    var dt = TZDate.timezone.getTzInfo(parseISO('2010-03-28T00:59:59'), 'Europe/Berlin', true); // CEST, from local time
     expect(dt.tzAbbr, 'CET');
   });
 
   it('should get abbr CEST from tz info of 2010-03-08T01:00:00 UTC', function () {
-    var dt = timezoneJS.timezone.getTzInfo(parseISO('2010-03-28T01:00:00'), 'Europe/Berlin', true); // CEST, from local time
+    var dt = TZDate.timezone.getTzInfo(parseISO('2010-03-28T01:00:00'), 'Europe/Berlin', true); // CEST, from local time
     expect(dt.tzAbbr, 'CEST');
   });
 
   it('should get abbr CST from 2010-03-14T01:59:59 Chicago', function () {
-    var dt = timezoneJS.timezone.getTzInfo(parseISO('2010-03-14T01:59:59'), 'America/Chicago'); // CST, from local time
+    var dt = TZDate.timezone.getTzInfo(parseISO('2010-03-14T01:59:59'), 'America/Chicago'); // CST, from local time
     expect(dt.tzAbbr).toEqual('CST');
   });
 
   it('should get abbr CDT from 2010-03-14T03:00:00 Chicago', function () {
-    var dt = timezoneJS.timezone.getTzInfo(parseISO('2010-03-14T03:00:00'), 'America/Chicago'); // CST, from local time
+    var dt = TZDate.timezone.getTzInfo(parseISO('2010-03-14T03:00:00'), 'America/Chicago'); // CST, from local time
     expect(dt.tzAbbr).toEqual('CDT');
   });
 
   it('should get abbr CST from 2010-03-14T07:59:59 UTC', function () {
-    var dt = timezoneJS.timezone.getTzInfo(parseISO('2010-03-14T07:59:59'), 'America/Chicago', true); // CST, from local time
+    var dt = TZDate.timezone.getTzInfo(parseISO('2010-03-14T07:59:59'), 'America/Chicago', true); // CST, from local time
     expect(dt.tzAbbr).toEqual('CST');
   });
 
   it('should get abbr CDT from 2010-03-14T08:00:00 Chicago', function () {
-    var dt = timezoneJS.timezone.getTzInfo(parseISO('2010-03-14T08:00:00'), 'America/Chicago', true); // CST, from local time
+    var dt = TZDate.timezone.getTzInfo(parseISO('2010-03-14T08:00:00'), 'America/Chicago', true); // CST, from local time
     expect(dt.tzAbbr).toEqual('CDT');
   });
 
   //This is for issue #1 in github
   it('should not get null in getAllZones', function () {
-    var zones = timezoneJS.timezone.getAllZones();
+    var zones = TZDate.timezone.getAllZones();
     for (var i = 0; i < zones; i++) {
       expect(zones[i]).not.toBe(null);
     }
@@ -161,14 +162,14 @@ describe('TimezoneJS', function () {
   it('should get tzInfo quickly', function () {
     var time = Date.now();
     for (var i = 0; i < 5000; i++) {
-      timezoneJS.timezone.getTzInfo(new Date(), 'America/Chicago');
+      TZDate.timezone.getTzInfo(new Date(), 'America/Chicago');
     }
     console.log('Took ' + (Date.now() - time) + 'ms to get 5000 same tzInfo');
   });
 
   it('should throw error with invalid zone', function () {
     var testFn = function () {
-      timezoneJS.timezone.getTzInfo(new Date(), 'asd')
+      TZDate.timezone.getTzInfo(new Date(), 'asd')
     }
     expect(testFn).toThrow(new Error('Timezone "asd" is either incorrect, or not loaded in the timezone registry.'));
   });
