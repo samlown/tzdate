@@ -1,4 +1,6 @@
-var fs = require('fs');
+var fs = require('fs')
+  , path = require('path');
+
 (function () {
 
   var root = this;
@@ -10,18 +12,18 @@ var fs = require('fs');
     TestUtils = root.TestUtils = {};
   }
 
-  var init = function (TZDate, options) {
+  var init = function (TZDate, options, config) {
     var opts = {
       async: false,
-      loadingScheme: TZDate.timezone.loadingSchemes.LAZY_LOAD
     };
     for (var k in (options || {})) {
       opts[k] = options[k];
     }
+
     //Reset everything
-    TZDate.timezone.zones = {};
-    TZDate.timezone.rules = {};
-    TZDate.timezone.loadedZones = {};
+    //TZDate.timezone.zones = {};
+    //TZDate.timezone.rules = {};
+    //TZDate.timezone.loadedZones = {};
 
     //Set up again
     TZDate.timezone.zoneFileBasePath = 'lib/tz';
@@ -36,13 +38,25 @@ var fs = require('fs');
       }
       return fs.readFileSync(opts.url, 'utf8');
     };
-    TZDate.timezone.loadingScheme = opts.loadingScheme;
+
+    // If a loadingScheme provided, use it, otherwise stick with default
+    if (opts.loadingScheme)
+      TZDate.timezone.loadingScheme = opts.loadingScheme;
+
+    // Allow for some configuration also
+    for (var k in (config || {})) {
+      TZDate.timezone[k] = config[k];
+    }
+
+    // Initialize the object ready to use
     TZDate.timezone.init(opts);
     return TZDate;
   };
 
-  TestUtils.getTZDate = function (options) {
-    return init(require('../src/tzdate'), options);
+  TestUtils.getTZDate = function (options, config) {
+    // Invalidate the require cache to force a reload
+    require.cache[path.resolve('src/tzdate.js')] = null;
+    return init(require('../src/tzdate'), options, config);
   }
 
   TestUtils.parseISO = function (timestring) {

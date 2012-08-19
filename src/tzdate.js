@@ -920,19 +920,27 @@ var TZDate = (function(Date, Math, Array) {
 
     this.init = function (o) {
       var opts = { async: true }
-        , def = this.defaultZoneFile = this.loadingScheme === this.loadingSchemes.PRELOAD_ALL
-          ? this.zoneFiles
-          : 'northamerica'
         , done = 0
-        , callbackFn;
-      //Override default with any passed-in opts
+        , callbackFn
+        , def;
+
+      if (!this.defaultZoneFile) {
+        def = this.defaultZoneFile = (this.loadingScheme === this.loadingSchemes.PRELOAD_ALL
+            ? this.zoneFiles
+            : 'northamerica')
+      } else {
+        def = this.defaultZoneFile
+      }
+
+      // Override default with any passed-in opts
       for (var p in o) {
         opts[p] = o[p];
       }
       if (typeof def === 'string') {
         return this.loadZoneFile(def, opts);
       }
-      //Wraps callback function in another one that makes
+
+      // Wraps callback function in another one that makes
       // sure all files have been loaded.
       callbackFn = opts.callback;
       opts.callback = function () {
