@@ -19,6 +19,11 @@ describe('TZDate', function () {
     expect(date.toString('yyyy-MM-dd')).toEqual('2011-10-28');
   });
 
+  it('should receive date in UTC for Time zone', function() {
+    var date = new TZDate("2012-08-19T07:50:16.272Z", "Europe/Madrid")
+    expect(date.toString()).toEqual("2012-08-19 09:50:16")
+  });
+
   it('should format 2011-10-28T12:44:22.172 UTC to different formats correctly', function () {
     var date = new TZDate(2011,9,28,12,44,22,172,'Etc/UTC');
     expect(date.toString('MMM dd yyyy')).toEqual('Oct 28 2011');
@@ -49,7 +54,7 @@ describe('TZDate', function () {
 
   it('should convert dates from a timezone to UTC correctly', function () {
     var date = new TZDate(2007, 9, 31, 10, 30, 22, 'America/Los_Angeles');
-    date.setTimezone('Etc/GMT');
+    date.setTimezone('Etc/UTC');
     expect(date.getTime()).toEqual(1193851822000);
     expect(date.toString('MMM dd yyyy hh:mm:ss TT Z')).toEqual('Oct 31 2007 05:30:22 PM UTC');
     expect(date.getHours()).toEqual(17);
@@ -204,16 +209,6 @@ describe('TZDate', function () {
     expect(dt.getTimezoneAbbreviation()).toEqual(dtA.getTimezoneAbbreviation());
   });
 
-  it('should convert timezone quickly', function () {
-    var start = Date.now()
-    , yearToMillis = 5 * 365 * 24 * 3600 * 1000
-    , date;
-    for (var i = 0; i < 5000; i++) {
-      date = new TZDate(start - Math.random() * yearToMillis, 'America/New_York');
-      date.setTimezone('Europe/Minsk');
-    }
-    console.log('Took ' + (Date.now() - start) + 'ms to convert 5000 dates');
-  });
 
   it('should output 1955-10-30 00:00:00 America/New_York as EDT', function () {
     var dt = new TZDate(1955, 9, 30, 0, 0, 0, 'America/New_York');
@@ -227,4 +222,28 @@ describe('TZDate', function () {
     expect(dt.toString()).toEqual('2011-12-31 00:00:00');
     expect(dt.getTime()).toEqual(t);
   });
+
+  it('should handle Rails name mappings correctly', function() {
+    var dt = new TZDate(2011, 7, 18, 12, 00, 00, 'Madrid');
+    expect(dt.timezone).toEqual('Europe/Madrid');
+    expect(dt.toString()).toEqual('2011-08-18 12:00:00');
+    dt.setTimezone('Mexico City')
+    expect(dt.timezone).toEqual('America/Mexico_City');
+    expect(dt.toString()).toEqual('2011-08-18 05:00:00');
+  });
+
+
+  // Speed tests
+
+  it('should convert timezone quickly', function () {
+    var start = Date.now()
+    , yearToMillis = 5 * 365 * 24 * 3600 * 1000
+    , date;
+    for (var i = 0; i < 5000; i++) {
+      date = new TZDate(start - Math.random() * yearToMillis, 'America/New_York');
+      date.setTimezone('Europe/Minsk');
+    }
+    console.log('Took ' + (Date.now() - start) + 'ms to convert 5000 dates');
+  });
+
 });

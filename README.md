@@ -2,11 +2,11 @@
 
 A timezone-enabled, drop-in replacement for the stock JavaScript Date. The `TZDate` object is API-compatible with JS Date, with the same getter and setter methods -- it should work fine in any code that works with normal JavaScript Dates.
 
-This project is essentially a merge of [XDate](https://github.com/arshaw/xdate) and [timezoneJS](https://github.com/mde/timezone-js) in an attempt to provide the formatting capabilities of XDate with powerful timezone parsing. Currently there is no support for XDate's date arithmetic.
-
 ## Overview
 
 The `TSDate` object gives you full-blown timezone support, independent from the timezone set on the end-user's machine running the browser. It uses the Olson zoneinfo files for its timezone data.
+
+This project is essentially a merge of [XDate](https://github.com/arshaw/xdate) and [timezoneJS](https://github.com/mde/timezone-js) in an attempt to provide the formatting capabilities of XDate with powerful timezone parsing. Currently there is no support for XDate's date arithmetic.
 
 The constructor function and setter methods use proxy JavaScript Date objects behind the scenes, so you can use strings like '10/22/2006' with the constructor. You also get the same sensible wraparound behavior with numeric parameters (like setting a value of 14 for the month wraps around to the next March).
 
@@ -84,6 +84,12 @@ The getTimezone method tells you what timezone a `TZDate` is set to.
 
 	var dt = new TZDate('12/27/2010', 'Asia/Tokyo');
 	dt.getTimezone(); => 'Asia/Tokyo'
+
+[Rails's timezone naming](http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html) is also supported. Setting a timezone using friendly city names can make things easier if you are looking for compatibility with your Rails project:
+
+    var dt = new TZDate("2012-08-18T12:00:00Z", "Madrid")
+    dt.toString(); // => "2012-08-18 14:00:00"
+
 
 ## Customizing
 
