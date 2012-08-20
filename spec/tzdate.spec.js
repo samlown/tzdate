@@ -12,6 +12,17 @@ describe('TZDate', function () {
     expect(date.toISOString()).toMatch(/[\d]{4}(-[\d]{2}){2}T([\d]{2}:){2}[\d]{2}.[\d]{3}/);
   });
 
+  describe('#toUTCString', function() {
+    it('should provide GMT style string by default', function() {
+      var date = new TZDate(2012, 7, 20, 15, 51, 30, "Europe/Madrid");
+      expect(date.toUTCString()).toEqual('Mon, 20 Aug 2012 13:51:30 GMT');
+    });
+    it ('should accept format if required', function() {
+      var date = new TZDate(2012, 7, 20, 15, 51, 30, "Europe/Madrid");
+      expect(date.toUTCString('yyyy MMM dd, HH:mm')).toEqual("2012 Aug 20, 13:51");
+    });
+  });
+
   it('should get date correctly from UTC (2011-10-28T12:44:22.172000000)', function () {
     var date = new TZDate(2011, 9, 28, 12, 44, 22, 172,'Etc/UTC');
     expect(date.getTime()).toEqual(1319805862172);

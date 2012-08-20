@@ -385,7 +385,7 @@ var TZDate = (function(Date, Math, Array) {
     toSource: function () {},
     toISOString: function () { return this.toString(ISO_FORMAT_STRING_TZ, 'Etc/UTC'); },
     toJSON: function () { return this.toISOString(); },
-    toUTCString: function () { return this.toGMTString(); },
+    toUTCString: function (format, locale) { return (format ? this.toString(format, 'Etc/UTC', locale) : this.toGMTString()); },
     civilToJulianDayNumber: function (y, m, d) {
       var a;
       // Adjust for zero-based JS-style array
