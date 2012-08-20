@@ -87,6 +87,7 @@ describe('TZDate', function () {
     expect(dtA.toString()).toEqual('2007-10-31 12:30:00');
   });
 
+
   it('should output toISOString correctly', function () {
     var dtA = new Date()
     , dt = new TZDate();
@@ -145,8 +146,14 @@ describe('TZDate', function () {
     expect(dt.getTime()).toEqual(0);
   });
 
+  it('should accept local date in string and array with same result', function () {
+    var dtA = new TZDate('2012-01-01 15:00:00', 'Asia/Bangkok')
+    var dtB = new TZDate(2012, 0, 1, 15, 0, 0, 'Asia/Bangkok')
+    expect(dtA.toString()).toEqual(dtB.toString());
+  });
+
   it('should take in String and Asia/Bangkok as constructor', function () {
-    //This is a RFC 3339 UTC string format
+    // This is a RFC 3339 UTC string format
     var dt = new TZDate('2012-01-01T15:00:00.000', 'Asia/Bangkok');
 
     expect(dt.toString()).toEqual('2012-01-01 22:00:00');
@@ -234,13 +241,23 @@ describe('TZDate', function () {
     expect(dt.getTime()).toEqual(t);
   });
 
-  it('should handle Rails name mappings correctly', function() {
-    var dt = new TZDate(2011, 7, 18, 12, 00, 00, 'Madrid');
-    expect(dt.timezone).toEqual('Europe/Madrid');
-    expect(dt.toString()).toEqual('2011-08-18 12:00:00');
-    dt.setTimezone('Mexico City')
-    expect(dt.timezone).toEqual('America/Mexico_City');
-    expect(dt.toString()).toEqual('2011-08-18 05:00:00');
+
+  describe("Rails mappings", function() {
+
+    it('should handle mappings correctly', function() {
+      var dt = new TZDate(2011, 7, 18, 12, 00, 00, 'Madrid');
+      expect(dt.timezone).toEqual('Europe/Madrid');
+      expect(dt.toString()).toEqual('2011-08-18 12:00:00');
+      dt.setTimezone('Mexico City')
+      expect(dt.timezone).toEqual('America/Mexico_City');
+      expect(dt.toString()).toEqual('2011-08-18 05:00:00');
+    });
+
+    it('should handle mappings with spaces correctly', function() {
+      var dt = new TZDate(2011, 7, 18, 12, 00, 00, 'Mexico City');
+      expect(dt.timezone).toEqual('America/Mexico_City');
+    });
+
   });
 
 

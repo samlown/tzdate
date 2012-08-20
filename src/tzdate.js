@@ -221,7 +221,7 @@ var TZDate = (function(Date, Math, Array) {
     if (Object.prototype.toString.call(args[0]) === '[object Array]') {
       args = args[0];
     }
-    if (typeof args[args.length - 1] === 'string' && /^[A-Z][a-zA-Z]+/g.test(args[args.length - 1])) {
+    if (isTimezone(args[args.length - 1])) {
       tz = args.pop();
     }
     switch (args.length) {
@@ -253,11 +253,14 @@ var TZDate = (function(Date, Math, Array) {
     tz = _timezoneMappings[tz] || tz
     date.timezone = tz || null;
 
-    // Tricky part:
-    // For the cases where there are 1/2 arguments: `TZDate(millis, [tz])` and `TZDate(Date, [tz])`. The
-    // Date `dt` created should be in UTC. Thus the way I detect such cases is to determine if `arr` is not populated & `tz`
-    // is specified. Because if `tz` is not specified, `dt` can be in local time.
-    if (arr.length) {
+    /*
+     * Tricky part:
+     * For the cases where there are 1/2 arguments: `TZDate(millis, [tz])`, `TZDate(Date, [tz])`,
+     * or `TZDate('2012-08-12T12:32:43Z', [tz])` we know that the dt should be in UTC.
+     * Otherwise, assume we've been provided a local time to be handled as if it was
+     * an array.
+     */
+    if (arr.length || (isString(args[0]) && !isRFCString(args[0]))) {
        date.setFromDateObjProxy(dt);
     } else {
        date.setFromTimeProxy(dt.getTime(), tz);
@@ -1155,6 +1158,14 @@ var TZDate = (function(Date, Math, Array) {
     return typeof arg == 'function';
   }
 
+  function isTimezone(string) {
+    return (typeof string === 'string' && /^[A-Z][a-zA-Z]+/g.test(string));
+  }
+
+  // Check if the string is an RFC time.
+  function isRFCString(string) {
+    return isString(string) && string.match(/T|(Z|[+\-]\d{2}:\d{2})$/);
+  }
 
   function zeroPad(n, len) {
     len = len || 2;
