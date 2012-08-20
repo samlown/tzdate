@@ -340,6 +340,7 @@ var TZDate = (function(Date, Math, Array) {
       this._dateProxy = dt;
       this._timeProxy = Date.UTC(this.year, this.month, this.date, this.hours, this.minutes, this.seconds, this.milliseconds);
       this._useCache = false;
+      this[0] = this._dateProxy; // for pretty console output
     },
     setFromTimeProxy: function (utcMillis, tz) {
       var dt = new Date(utcMillis);
