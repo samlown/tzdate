@@ -146,6 +146,13 @@ describe('TZDate', function () {
     expect(dt.getTime()).toEqual(0);
   });
 
+  it('should take in null object in constructor', function () {
+    var dtA = new Date(0)
+      , dtB = new TZDate(null);
+    expect(dtA.getTime()).toEqual(dtB.getTime());
+  });
+
+
   it('should accept local date in string and array with same result', function () {
     var dtA = new TZDate('2012-01-01 15:00:00', 'Asia/Bangkok')
     var dtB = new TZDate(2012, 0, 1, 15, 0, 0, 'Asia/Bangkok')

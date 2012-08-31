@@ -227,7 +227,7 @@ var TZDate = (function(Date, Math, Array) {
     if (args.length == 0) {
       dt = new Date();
     } else if ((args.length == 1) && 
-        (isObject(args[0]) || isNumber(args[0]) ||
+        (!args[0] || isObject(args[0]) || isNumber(args[0]) ||
          isRFCDate(args[0]) || isHumanDate(args[0]))) {
       // String parsing is a bit rubbish
       dt = new Date(args[0]);
@@ -235,7 +235,6 @@ var TZDate = (function(Date, Math, Array) {
       if (args.length == 1) {
         arr = args[0].split(/\D+/);
         arr[1] = arr[1] - 1; // fix month
-        console.log(arr)
       } else {
         for (var i = 0; i < 7; i++) {
           arr[i] = args[i];
