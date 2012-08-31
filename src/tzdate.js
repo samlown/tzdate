@@ -224,19 +224,27 @@ var TZDate = (function(Date, Math, Array) {
     if (isTimezone(args[args.length - 1])) {
       tz = args.pop();
     }
-    switch (args.length) {
-      case 0:
-        dt = new Date();
-        break;
-      case 1:
-        dt = new Date(args[0]);
-        break;
-      default:
+    if (args.length == 0) {
+      dt = new Date();
+    } else if ((args.length == 1) && 
+        (isObject(args[0]) || isNumber(args[0]) ||
+         isRFCDate(args[0]) || isHumanDate(args[0]))) {
+      // String parsing is a bit rubbish
+      dt = new Date(args[0]);
+    } else {
+      if (args.length == 1) {
+        arr = args[0].split(/\D+/);
+        arr[1] = arr[1] - 1; // fix month
+        console.log(arr)
+      } else {
         for (var i = 0; i < 7; i++) {
-          arr[i] = args[i] || 0;
+          arr[i] = args[i];
         }
-        dt = new Date(arr[0], arr[1], arr[2], arr[3], arr[4], arr[5], arr[6]);
-        break;
+      }
+      for (var i = 0; i < 7; i++) {
+        arr[i] = parseInt(arr[i] || 0);
+      }
+      dt = new Date(arr[0], arr[1], arr[2], arr[3], arr[4], arr[5], arr[6]);
     }
 
     // Reset the date attributes
@@ -260,7 +268,7 @@ var TZDate = (function(Date, Math, Array) {
      * Otherwise, assume we've been provided a local time to be handled as if it was
      * an array.
      */
-    if (arr.length || (isString(args[0]) && !isRFCString(args[0]))) {
+    if (arr.length) {
        date.setFromDateObjProxy(dt);
     } else {
        date.setFromTimeProxy(dt.getTime(), tz);
@@ -1153,6 +1161,9 @@ var TZDate = (function(Date, Math, Array) {
     return typeof arg == 'boolean';
   }
 
+  function isObject(arg) {
+    return typeof arg == 'object';
+  }
 
   function isFunction(arg) {
     return typeof arg == 'function';
@@ -1163,9 +1174,28 @@ var TZDate = (function(Date, Math, Array) {
   }
 
   // Check if the string is an RFC time.
-  function isRFCString(string) {
+  function isRFCDate(string) {
     return isString(string) && string.match(/T|(Z|[+\-]\d{2}:\d{2})$/);
   }
+
+  // A date that contains human characters such as day names, months, and time zones.
+  // Basically when there is more than one non-numbers together.
+  //
+  // For example, this is human:
+  //
+  //    new Date("Mon Oct 01 2012 20:00:00 GMT") // Parsed by browser
+  //
+  // This is not:
+  //
+  //    new Date("2012-10-01 20:00") // invalid date
+  //
+  // This is to get round problems with some browsers that know
+  // how to parse human strings, but not others.
+  //
+  function isHumanDate(string) {
+    return isString(string) && string.match(/\D\D/);
+  }
+
 
   function zeroPad(n, len) {
     len = len || 2;
