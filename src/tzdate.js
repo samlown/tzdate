@@ -226,20 +226,25 @@ var TZDate = (function(Date, Math, Array) {
     }
     if (args.length == 0) {
       dt = new Date();
-    } else if ((args.length == 1) && 
-        (!args[0] || isObject(args[0]) || isNumber(args[0]) ||
-         isRFCDate(args[0]) || isHumanDate(args[0]))) {
-      // String parsing is a bit rubbish
-      dt = new Date(args[0]);
-    } else {
-      if (args.length == 1) {
+    } else if (args.length == 1) {
+      if (!args[0] || isObject(args[0]) || isNumber(args[0])) {
+        // Regular date
+        dt = new Date(args[0]);
+      } else if (isRFCDate(args[0]) || isHumanDate(args[0])) {
+        // Needs a manual parse
+        dt = parse(args[0]);
+      } else {
+        // A non-iso local date string to split up
         arr = args[0].split(/\D+/);
         arr[1] = arr[1] - 1; // fix month
-      } else {
-        for (var i = 0; i < 7; i++) {
-          arr[i] = args[i];
-        }
       }
+    } else {
+      for (var i = 0; i < 7; i++) {
+        arr[i] = args[i];
+      }
+    }
+
+    if (arr.length > 0) {
       for (var i = 0; i < 7; i++) {
         arr[i] = parseInt(arr[i] || 0);
       }
@@ -423,6 +428,61 @@ var TZDate = (function(Date, Math, Array) {
   // Pretty output handling for Firebug and WebInspector
   proto.length = 1;
   proto.splice = Array.prototype.splice;
+
+
+  /* Date parsing
+  ---------------------------------------------------------------------------------*/
+
+  TZDate.parsers = [
+    parseISO
+  ];
+
+  /*
+   * This is not yet supported!
+   *
+  TZDate.parse = function(str) {
+    return +TZDate(''+str);
+  };
+  */
+
+  function parse(str, date) {
+    var parsers = TZDate.parsers;
+    var i = 0;
+    var res;
+    for (; i < parsers.length; i++) {
+      res = parsers[i](str, date);
+      if (res) {
+        return res;
+      }
+    }
+    // Fallback to normal parsing
+    return new Date(str);
+  }
+
+
+  function parseISO(str, date) {
+    var m = str.match(/^(\d{4})(-(\d{2})(-(\d{2})([T ](\d{2}):(\d{2})(:(\d{2})(\.(\d+))?)?(Z|(([-+])(\d{2})(:?(\d{2}))?))?)?)?)?$/);
+    if (m) {
+      var d = new Date(Date.UTC(
+        m[1],
+        m[3] ? m[3] - 1 : 0,
+        m[5] || 1,
+        m[7] || 0,
+        m[8] || 0,
+        m[10] || 0,
+        m[12] ? Number('0.' + m[12]) * 1000 : 0
+      ));
+      if (m[13]) { // has gmt offset or Z
+        if (m[14]) { // has gmt offset
+          d.setUTCMinutes(
+            d.getUTCMinutes() +
+            (m[15] == '-' ? 1 : -1) * (Number(m[16]) * 60 + (m[18] ? Number(m[18]) : 0))
+          );
+        }
+      } // no specified timezone
+      return d;
+    }
+  }
 
 
   /* Formatting
